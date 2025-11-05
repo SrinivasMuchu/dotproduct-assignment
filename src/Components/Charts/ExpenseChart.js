@@ -13,13 +13,9 @@ const ExpenseChart = () => {
   const chartTypes = [
     { value: 'bar', label: '📊 Bar Chart', description: 'Compare categories side by side' },
     { value: 'pie', label: '🥧 Pie Chart', description: 'Show proportion of total expenses' },
-    { value: 'donut', label: '🍩 Donut Chart', description: 'Modern pie chart with center space' },
     { value: 'line', label: '📈 Line Chart', description: 'Show trends over categories' },
-    { value: 'area', label: '📉 Area Chart', description: 'Filled line chart for emphasis' },
     { value: 'horizontal', label: '📋 Horizontal Bar', description: 'Better for long category names' },
-    { value: 'column', label: '📏 Column Chart', description: 'Vertical bars with spacing' },
-    { value: 'scatter', label: '🔵 Scatter Plot', description: 'Show data points distribution' }
-  ];
+     ];
 
   // Get user ID from localStorage
   const getUserId = () => {
@@ -112,24 +108,16 @@ const ExpenseChart = () => {
       case 'pie':
         drawPieChart(g, width, height, colorScale);
         break;
-      case 'donut':
-        drawDonutChart(g, width, height, colorScale);
-        break;
+      
       case 'line':
         drawLineChart(g, width, height, colorScale);
         break;
-      case 'area':
-        drawAreaChart(g, width, height, colorScale);
-        break;
+      
       case 'horizontal':
         drawHorizontalBarChart(g, width, height, colorScale);
         break;
-      case 'column':
-        drawColumnChart(g, width, height, colorScale);
-        break;
-      case 'scatter':
-        drawScatterPlot(g, width, height, colorScale);
-        break;
+      
+      
       default:
         drawBarChart(g, width, height, colorScale);
     }
@@ -224,49 +212,7 @@ const ExpenseChart = () => {
     addLegend(g, data, colorScale, width, height);
   };
 
-  const drawDonutChart = (g, width, height, colorScale) => {
-    const radius = Math.min(width, height) / 2;
-    const pie = d3.pie().value(d => d.amount);
-    const arc = d3.arc().innerRadius(radius * 0.4).outerRadius(radius - 10);
-
-    g.attr('transform', `translate(${width / 2},${height / 2})`);
-
-    const slices = g.selectAll('.slice')
-      .data(pie(data))
-      .enter().append('g')
-      .attr('class', 'slice');
-
-    slices.append('path')
-      .attr('fill', d => colorScale(d.data.category))
-      .attr('stroke', 'white')
-      .attr('stroke-width', 2)
-      .transition()
-      .duration(800)
-      .attrTween('d', function(d) {
-        const interpolate = d3.interpolate({startAngle: 0, endAngle: 0}, d);
-        return function(t) { return arc(interpolate(t)); };
-      });
-
-    // Center text
-    const totalAmount = data.reduce((sum, d) => sum + d.amount, 0);
-    g.append('text')
-      .attr('text-anchor', 'middle')
-      .attr('y', -10)
-      .style('font-size', '24px')
-      .style('font-weight', 'bold')
-      .style('fill', '#333')
-      .text('Total');
-
-    g.append('text')
-      .attr('text-anchor', 'middle')
-      .attr('y', 20)
-      .style('font-size', '18px')
-      .style('fill', '#666')
-      .text(`₹${totalAmount.toLocaleString('en-IN')}`);
-
-    addLegend(g, data, colorScale, width, height);
-  };
-
+  
   const drawLineChart = (g, width, height, colorScale) => {
     const xScale = d3.scaleBand()
       .domain(data.map(d => d.category))
@@ -312,57 +258,7 @@ const ExpenseChart = () => {
     addAxesLabels(g, width, height, 'Categories', 'Amount (₹)');
   };
 
-  const drawAreaChart = (g, width, height, colorScale) => {
-    const xScale = d3.scaleBand()
-      .domain(data.map(d => d.category))
-      .range([0, width])
-      .padding(0.1);
-
-    const yScale = d3.scaleLinear()
-      .domain([0, d3.max(data, d => d.amount)])
-      .nice()
-      .range([height, 0]);
-
-    const area = d3.area()
-      .x(d => xScale(d.category) + xScale.bandwidth() / 2)
-      .y0(height)
-      .y1(d => yScale(d.amount))
-      .curve(d3.curveMonotoneX);
-
-    // Add axes
-    g.append('g')
-      .attr('transform', `translate(0,${height})`)
-      .call(d3.axisBottom(xScale));
-
-    g.append('g')
-      .call(d3.axisLeft(yScale));
-
-    // Add area
-    g.append('path')
-      .datum(data)
-      .attr('fill', 'url(#areaGradient)')
-      .attr('d', area);
-
-    // Add gradient definition
-    const defs = g.append('defs');
-    const gradient = defs.append('linearGradient')
-      .attr('id', 'areaGradient')
-      .attr('gradientUnits', 'userSpaceOnUse')
-      .attr('x1', 0).attr('y1', height)
-      .attr('x2', 0).attr('y2', 0);
-
-    gradient.append('stop')
-      .attr('offset', '0%')
-      .attr('stop-color', '#4ECDC4')
-      .attr('stop-opacity', 0.1);
-
-    gradient.append('stop')
-      .attr('offset', '100%')
-      .attr('stop-color', '#4ECDC4')
-      .attr('stop-opacity', 0.8);
-
-    addAxesLabels(g, width, height, 'Categories', 'Amount (₹)');
-  };
+  
 
   const drawHorizontalBarChart = (g, width, height, colorScale) => {
     const xScale = d3.scaleLinear()
@@ -400,45 +296,9 @@ const ExpenseChart = () => {
     addAxesLabels(g, width, height, 'Amount (₹)', 'Categories');
   };
 
-  const drawColumnChart = (g, width, height, colorScale) => {
-    // Similar to bar chart but with more spacing
-    drawBarChart(g, width, height, colorScale);
-  };
+  
 
-  const drawScatterPlot = (g, width, height, colorScale) => {
-    const xScale = d3.scaleBand()
-      .domain(data.map(d => d.category))
-      .range([0, width])
-      .padding(0.1);
-
-    const yScale = d3.scaleLinear()
-      .domain([0, d3.max(data, d => d.amount)])
-      .nice()
-      .range([height, 0]);
-
-    // Add axes
-    g.append('g')
-      .attr('transform', `translate(0,${height})`)
-      .call(d3.axisBottom(xScale));
-
-    g.append('g')
-      .call(d3.axisLeft(yScale));
-
-    // Add circles
-    g.selectAll('.circle')
-      .data(data)
-      .enter().append('circle')
-      .attr('class', 'circle')
-      .attr('cx', d => xScale(d.category) + xScale.bandwidth() / 2)
-      .attr('cy', d => yScale(d.amount))
-      .attr('r', 0)
-      .attr('fill', d => colorScale(d.category))
-      .transition()
-      .duration(800)
-      .attr('r', 8);
-
-    addAxesLabels(g, width, height, 'Categories', 'Amount (₹)');
-  };
+ 
 
   const addAxesLabels = (g, width, height, xLabel, yLabel) => {
     // X-axis label
@@ -493,7 +353,7 @@ const ExpenseChart = () => {
   if (error) {
     return (
       <div className="chart-error">
-        <p>❌ {error}</p>
+        <p> {error}</p>
         <button onClick={fetchExpenseData} className="retry-btn">
           🔄 Retry
         </button>
