@@ -35,7 +35,7 @@ const ExpenseChart = () => {
       const userId = getUserId();
       if (!userId) return;
 
-      const response = await axios.get(`http://localhost:5050/transaction-tracker/transactions/${userId}`, {
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_BASE_URL}/transaction-tracker/transactions/${userId}`, {
         params: { limit: 1000 } // Get all transactions
       });
 

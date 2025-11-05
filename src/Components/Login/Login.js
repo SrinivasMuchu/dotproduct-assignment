@@ -34,7 +34,7 @@ function Login() {
   const handleLoginSubmit = async (e) => {
     e.preventDefault()
     try {
-      const response = await axios.post('http://localhost:5050/tracker/login', loginData)
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_BASE_URL}/tracker/login`, loginData)
       
       if (response.data.success) {
         // Store user data in localStorage for authentication
@@ -82,7 +82,7 @@ function Login() {
     }
     
     try {
-      const response = await axios.post('http://localhost:5050/tracker/signup', {
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_BASE_URL}/tracker/signup`, {
         name: signupData.name,
         email: signupData.email,
         password: signupData.password

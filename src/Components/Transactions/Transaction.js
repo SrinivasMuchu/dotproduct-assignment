@@ -35,7 +35,7 @@ function Transaction() {
       const userId = getUserId()
       if (!userId) return
 
-      const response = await axios.get(`http://localhost:5050/transaction-tracker/transactions/${userId}`, {
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_BASE_URL}/transaction-tracker/transactions/${userId}`, {
         params: {
           page: page,
           limit: limit,
@@ -117,7 +117,7 @@ function Transaction() {
 
       if (editingTransaction) {
         // Update transaction
-        const response = await axios.post('http://localhost:5050/transaction-tracker/transactions', {
+        const response = await axios.post(`${process.env.REACT_APP_BACKEND_BASE_URL}/transaction-tracker/transactions`, {
           action: 'update',
           id: editingTransaction._id,
           ...transactionData
@@ -129,7 +129,7 @@ function Transaction() {
         }
       } else {
         // Add new transaction
-        const response = await axios.post('http://localhost:5050/transaction-tracker/transactions', {
+        const response = await axios.post(`${process.env.REACT_APP_BACKEND_BASE_URL}/transaction-tracker/transactions`, {
           action: 'add',
           ...transactionData
         })
@@ -150,7 +150,7 @@ function Transaction() {
   const handleDelete = async (transactionId) => {
     if (window.confirm('Are you sure you want to delete this transaction?')) {
       try {
-        const response = await axios.post('http://localhost:5050/transaction-tracker/transactions', {
+        const response = await axios.post(`${process.env.REACT_APP_BACKEND_BASE_URL}/transaction-tracker/transactions`, {
           action: 'delete',
           id: transactionId
         })
